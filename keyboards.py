@@ -9,7 +9,7 @@ def main_menu():
     return keyboard
 
 def admin_menu():
-    add_access = KeyboardButton('🔑 Доступ беру')
+    add_access = KeyboardButton('🔑 Доступ қосу')
     myinfo = KeyboardButton('🌟 Мен жайлы')
     reviews = KeyboardButton('🎓 Шәкірттер')
     сourse = KeyboardButton('📚 Интенсив')
@@ -58,6 +58,11 @@ def Nazerke():
 
 def pay_pay():
     buttons = [[InlineKeyboardButton(text='Ақпарат қалдыру', callback_data='info')]]
+    keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
+    return keyboard
+
+def cancel():
+    buttons = [[InlineKeyboardButton(text='❌ Бас тарту', callback_data='cancel')]]
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
     return keyboard
 
