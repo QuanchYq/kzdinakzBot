@@ -216,7 +216,7 @@ async def ask_company_type(message: types.Message, state: FSMContext):
     keyboard.add(KeyboardButton('🏢 ИП'))
     keyboard.add(KeyboardButton('🏠 Жеке'))
     await FormStates.company_type.set()
-    await message.answer("🌐 Выберите тип вашей компании", reply_markup=keyboard)
+    await message.answer("🌐 Компания түрін таңдаңыз.", reply_markup=keyboard)
 
 @dp.message_handler(Text(equals=['🌐 ТОО', '🏢 ИП', '🏠 Жеке']), state=FormStates.company_type)
 async def ask_instagram_link(message: types.Message, state: FSMContext):
