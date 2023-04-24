@@ -7,9 +7,9 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 import os
-from aiogram.utils.markdown import text, bold, italic, code, pre, hlink, hbold 
+from aiogram.utils.markdown import text, bold, italic, code, pre, hlink, hbold
 from aiogram.dispatcher.filters import Text
-from keyboards import main_menu, admin_menu, people, Gulsim, Zhaina, Inkar, Zhanat, Nazerke, pay_pay
+from keyboards import main_menu, admin_menu, people, Gulsim, Zhaina, Inkar, Zhanat, Nazerke, pay_pay, cancel
 from libs import isAdmin, add_user, isAdminUsername, add_user_username
 import json
 import os
@@ -31,7 +31,7 @@ storage = MemoryStorage()
 bot = Bot(token=token_bot,parse_mode=types.ParseMode.HTML)
 dp = Dispatcher(bot, storage=storage)
 
-Admins = [695064750]
+Admins = [695064755]
 
 
 
@@ -39,6 +39,7 @@ class FormStates(StatesGroup):
     name = State()
     surname = State()
     company_type = State()
+    number = State()
     instagram_link = State()
 
 
@@ -47,11 +48,11 @@ class FormStates(StatesGroup):
 start_message = """
 <b>Сәлеметсізбе!</b> 🎉
 
-<b>Интенсивке</b> қош келдіңіз! 🤖📚
+Интенсивке қош келдіңіз! 🤖📚
 
-<b>Курс туралы көбірек білу үшін "Интенсив" түймесін басыңыз - сізді бағдарлама және шәкірттер туралы мәліметтер күтеді. 📝💡</b>
+Курс туралы көбірек білу үшін <b>"Интенсив"</b> түймесін басыңыз - сізді бағдарлама және шәкірттер туралы мәліметтер күтеді. 📝💡
 
-<b>Жаңа білім мен жетістікке жету жолын бастауға дайынсыз ба? 👍💪</b>
+Жаңа білім мен жетістікке жету жолын бастауға дайынсыз ба? 👍💪
 """
 
 # Define the handler for the /start command
@@ -69,10 +70,10 @@ async def about_me(message: types.Message):
     photo = open('images/dina.jpg', 'rb')
 
     text = f'''
-*👋 Сәлем. Мені оқырмандарым Дина деп атайды.* 🤗
+*👋 Сәлем.* Мені оқырмандарым Дина деп атайды. 🤗
 
-🙍‍♀️ *Жасы 29-да.*
-🌏 *Алматы қаласында туылған*
+🙍‍♀️ Жасы 29-да.
+🌏 Алматы қаласында туылған
 . 🏙
 
 `2012 — 2013 жж` 
@@ -94,6 +95,13 @@ _ТикТок эксперт_
 
 '''
     await bot.send_photo(chat_id=message.chat.id, photo=photo , caption=text, parse_mode=types.ParseMode.MARKDOWN)
+
+@dp.callback_query_handler(lambda c: c.data == 'cancel', state='*')
+async def cancel_bot(callback_query: types.CallbackQuery , state: FSMContext):
+    await state.finish()
+    await bot.send_message(chat_id=callback_query.from_user.id, text='✅ Сәтті жойылды',
+                           reply_markup=main_menu())
+
 
 @dp.message_handler(lambda message: message.text == '🎓 Шәкірттер')
 async def add_review(message: types.Message):
@@ -189,7 +197,7 @@ async def pay(message: types.Message):
 @dp.callback_query_handler(lambda c: c.data == 'info')
 async def name(callback_query: types.CallbackQuery, ):
     await FormStates.name.set()
-    await callback_query.message.edit_text("💭 Атыңызды теріңіз")
+    await callback_query.message.edit_text("💭 Атыңызды теріңіз", reply_markup=cancel())
 
 
 @dp.message_handler(state=FormStates.name)
@@ -197,7 +205,7 @@ async def ask_surname(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['name'] = message.text
     await FormStates.surname.set()
-    await message.answer("👤 Тегіңізді теріңіз")
+    await message.answer("👤 Тегіңізді теріңіз", reply_markup=cancel())
 
 @dp.message_handler(state=FormStates.surname)
 async def ask_company_type(message: types.Message, state: FSMContext):
@@ -206,16 +214,23 @@ async def ask_company_type(message: types.Message, state: FSMContext):
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
     keyboard.add(KeyboardButton('ТОО'))
     keyboard.add(KeyboardButton('ИП'))
-    keyboard.add(KeyboardButton('Басқа'))
+    keyboard.add(KeyboardButton('Жеке'))
     await FormStates.company_type.set()
-    await message.answer("Выберите тип вашей компании", reply_markup=keyboard)
+    await message.answer("🌐 Выберите тип вашей компании", reply_markup=keyboard)
 
 @dp.message_handler(Text(equals=['ТОО', 'ИП', 'Басқа']), state=FormStates.company_type)
 async def ask_instagram_link(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['company_type'] = message.text
+    await FormStates.number.set()
+    await message.answer("🔢 Телефон номеріңізді теріңіз!", reply_markup=cancel())
+
+@dp.message_handler(state=FormStates.number)
+async def ask_instagram_link(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['number'] = message.text
     await FormStates.instagram_link.set()
-    await message.answer("Инстаграм линкіңізді теріңіз")
+    await message.answer("📎 Инстаграм линкіңізді теріңіз", reply_markup=cancel())
 
 @dp.message_handler(state=FormStates.instagram_link)
 async def finish_form(message: types.Message, state: FSMContext):
@@ -223,7 +238,7 @@ async def finish_form(message: types.Message, state: FSMContext):
         data['instagram_link'] = message.text
         form_data = data
     await state.finish()
-    await message.answer("Форма толтырылды!", reply_markup=main_menu())
+    await message.answer("✅ Форма толтырылды!", reply_markup=main_menu())
     CREDENTIALS_FILE = 'courses.json'  # Имя файла с закрытым ключом, вы должны подставить свое
 
 # Читаем ключи из файла
@@ -234,7 +249,7 @@ async def finish_form(message: types.Message, state: FSMContext):
 
     spreadsheetId = '1RM7f67tIk_cfua6vN1pauR7VhEiS62zFsLgWj-i9gYc'
     raw = [
-        [form_data['name'],form_data['surname'],form_data['company_type'],form_data['instagram_link']]
+        [form_data['name'],form_data['surname'],form_data['company_type'],form_data['number'],form_data['instagram_link']]
     ]
     body = {
         'values' : raw
@@ -253,7 +268,7 @@ async def finish_form(message: types.Message, state: FSMContext):
 class response(StatesGroup):
     response = State()
 
-@dp.message_handler(lambda message: message.text == '🔑 Доступ беру' )
+@dp.message_handler(lambda message: message.text == '🔑 Доступ қосу' )
 async def admin_only(message: types.Message):
     await response.response.set()
     user_id = message.from_user.id
@@ -292,9 +307,8 @@ async def echo(message: types.Message, state: FSMContext):
 @dp.message_handler(lambda message: message.text == '📚 Интенсив')
 async def course(message: types.Message):
     text = """
-<b>Интенсивтан не күтуге болады? 🎉</b>
+<i>Интенсивтан не күтуге болады? 🎉</i>
 
-<i>
 • <b>Аптасына 3 рет 2 сағаттан, TikTok-та аккаунтыңызды дамыту ⏰</b>.
 
 • <b>Алғашқы 1000 оқырман жинау📈💯</b>.
@@ -309,9 +323,9 @@ async def course(message: types.Message):
 
 • <b>TikTok-та нишаңызды жүргізу.</b>.
 
-• <b>🔝 TikTok-та сатылымды 2х көбейту жолдары.</b>.</i>
+• <b>🔝 TikTok-та сатылымды 2х көбейту жолдары.</b>
 
-<b>✅"Өткен интенсивімізден табыс жетілген шәкірттердің мәліметтерін алу үшін <u>🎓 Шәкірттер</u> батырмасын басыңыз.</b>"
+<i>✅"Өткен интенсивімізден табыс жетілген шәкірттердің мәліметтерін алу үшін <u>🎓 Шәкірттер</u> батырмасын басыңыз.</i>"
 """
     await bot.send_message(message.chat.id, text, parse_mode='HTML')
 
