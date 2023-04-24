@@ -31,7 +31,7 @@ storage = MemoryStorage()
 bot = Bot(token=token_bot,parse_mode=types.ParseMode.HTML)
 dp = Dispatcher(bot, storage=storage)
 
-Admins = [695064755]
+Admins = [695064750]
 
 
 
