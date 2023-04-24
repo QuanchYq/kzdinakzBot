@@ -3,6 +3,7 @@ WORKDIR /app
 
 
 # Install dependencies
+COPY images /app/images
 COPY courses.json /app/courses.json
 COPY requirements.txt /app/requirements.txt
 COPY keyboards.py /app/keyboards.py
