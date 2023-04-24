@@ -212,13 +212,13 @@ async def ask_company_type(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['surname'] = message.text
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-    keyboard.add(KeyboardButton('ТОО'))
-    keyboard.add(KeyboardButton('ИП'))
-    keyboard.add(KeyboardButton('Жеке'))
+    keyboard.add(KeyboardButton('🌐 ТОО'))
+    keyboard.add(KeyboardButton('🏢 ИП'))
+    keyboard.add(KeyboardButton('🏠 Жеке'))
     await FormStates.company_type.set()
     await message.answer("🌐 Выберите тип вашей компании", reply_markup=keyboard)
 
-@dp.message_handler(Text(equals=['ТОО', 'ИП', 'Басқа']), state=FormStates.company_type)
+@dp.message_handler(Text(equals=['🌐 ТОО', '🏢 ИП', '🏠 Жеке']), state=FormStates.company_type)
 async def ask_instagram_link(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['company_type'] = message.text
