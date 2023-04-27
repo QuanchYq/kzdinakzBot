@@ -31,7 +31,7 @@ storage = MemoryStorage()
 bot = Bot(token=token_bot,parse_mode=types.ParseMode.HTML)
 dp = Dispatcher(bot, storage=storage)
 
-Admins = [695064750]
+Admins = [695064755]
 
 
 
@@ -187,8 +187,8 @@ async def pay(message: types.Message):
     text = """
 👋 Біздің <b>Интенсивімізге</b> қосылыңыз! 🤩
 
-💰 <i>Төмендегі сілтемені пайдаланып, <b>Интенсивке</b> жазылыңыз!:</i>
-<u>📎 https://pay.kaspi.kz/pay/96v0sicr</u>
+💰 <i>Төмендегі номерге перевод жасап , @kzdinakz1 чек жіберіңіз!:</i>
+<u>📎 87769431000</u>
 
 ✅ Төлемнен кейін өзіңіз жайлы ақпарат қалдырыңыз! 🙌
     """
@@ -239,6 +239,15 @@ async def finish_form(message: types.Message, state: FSMContext):
         form_data = data
     await state.finish()
     await message.answer("✅ Форма толтырылды!", reply_markup=main_menu())
+    text = """
+🎉 <b>Интенсивқа сәтті жазылдыңыз!</b> 🎉
+
+<b>📅 Күні:</b><i> 2023 жылғы 1 мамыр</i>
+
+<b>Адрес пен уақытын сізге менеджер WhatsApp арқылы жібереді. Біз сізді күтеміз және сабағымызды бастауға дайынбыз! 💪 👨‍🏫    
+    </b>
+"""
+    await bot.send_message(message.from_user.id, text=text)
     CREDENTIALS_FILE = 'courses.json'  # Имя файла с закрытым ключом, вы должны подставить свое
 
 # Читаем ключи из файла
@@ -265,40 +274,40 @@ async def finish_form(message: types.Message, state: FSMContext):
 
 
 
-class response(StatesGroup):
-    response = State()
+# class response(StatesGroup):
+#     response = State()
 
-@dp.message_handler(lambda message: message.text == '🔑 Доступ қосу' )
-async def admin_only(message: types.Message):
-    await response.response.set()
-    user_id = message.from_user.id
-    if user_id in Admins:
-        await message.answer('🔓 Доступ беру үшін пайдаланушынын никін енгізіңіз.')
-    else:
-        await message.answer('🗝️ Сіздің құқығыңыз жоқ!')
+# @dp.message_handler(lambda message: message.text == '🔑 Доступ қосу' )
+# async def admin_only(message: types.Message):
+#     await response.response.set()
+#     user_id = message.from_user.id
+#     if user_id in Admins:
+#         await message.answer('🔓 Доступ беру үшін пайдаланушынын никін енгізіңіз.')
+#     else:
+#         await message.answer('🗝️ Сіздің құқығыңыз жоқ!')
 
-@dp.message_handler(state=response.response)
-async def echo(message: types.Message, state: FSMContext):
-    text = """
-🎉 <b>Интенсивқа сәтті жазылдыңыз!</b> 🎉
+# @dp.message_handler(state=response.response)
+# async def echo(message: types.Message, state: FSMContext):
+#     text = """
+# 🎉 <b>Интенсивқа сәтті жазылдыңыз!</b> 🎉
 
-<b>📅 Күні:</b><i> 2023 жылғы 1 мамыр</i>
+# <b>📅 Күні:</b><i> 2023 жылғы 1 мамыр</i>
 
-<b>Адрес пен уақытын сізге менеджер WhatsApp арқылы жібереді. Біз сізді күтеміз және сабағымызды бастауға дайынбыз! 💪 👨‍🏫    
-    </b>
-"""
-    if message.from_user.id in Admins:
-        if message.text:
-            async with state.proxy() as data:
-                data['user_id'] = ''
-                user_mes = message.text
-                await add_user(user_mes)
-                await bot.send_message(chat_id=user_mes, text=text)
-            await state.finish()
-        else:
-            await message.answer('Қате ID, қайтадан көріңіз')
-    else:
-        await message.answer('🔓 Сіздің құқығыңыз жоқ!')
+# <b>Адрес пен уақытын сізге менеджер WhatsApp арқылы жібереді. Біз сізді күтеміз және сабағымызды бастауға дайынбыз! 💪 👨‍🏫    
+#     </b>
+# """
+#     if message.from_user.id in Admins:
+#         if message.text:
+#             async with state.proxy() as data:
+#                 data['user_id'] = ''
+#                 user_mes = message.text
+#                 await add_user(user_mes)
+#                 await bot.send_message(chat_id=user_mes, text=text)
+#             await state.finish()
+#         else:
+#             await message.answer('Қате ID, қайтадан көріңіз')
+#     else:
+#         await message.answer('🔓 Сіздің құқығыңыз жоқ!')
 
 
 
